@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  本机是「手机自己当服务器」，页面来自 http://127.0.0.1:<port>/，
+  并且 WebSocket 用明文 ws://（PROTOCOL.md 第 0/2 节）。
+  targetSdk 28+ 默认禁止明文流量，必须在网络配置里显式放开，
+  否则 WebView 能打开页面但 WebSocket 会被系统拦掉。
+-->
+<network-security-config>
+
+    <!-- 默认：允许明文（覆盖 127.0.0.1 与局域网 IP，也覆盖 ws:// 升级） -->
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+            <!-- 供抓包/自签调试；仅 debug 构建生效 -->
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+
+    <!-- 本机回环：明确允许明文 -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">127.0.0.1</domain>
+        <domain includeSubdomains="true">localhost</domain>
+    </domain-config>
+
+</network-security-config>

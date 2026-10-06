@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<!-- 手机横屏为主要场景：限制缩放，viewport-fit 兼容刘海屏 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#1d2a20">
+<meta name="mobile-web-app-capable" content="yes">
+<title>骗子酒馆 α版 Liar's Bar</title>
+<!-- 全部静态资源使用相对路径：页面可能从 / 或 /gamepage 提供 -->
+<link rel="stylesheet" href="css/basic.css">
+<link rel="stylesheet" href="css/deck.css">
+<link rel="stylesheet" href="css/table.css">
+<link rel="stylesheet" href="css/effects.css">
+<link rel="stylesheet" href="css/revolver.css">
+<link rel="stylesheet" href="css/lobby.css">
+<link rel="stylesheet" href="css/short.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- ================= 顶栏 + 断线横幅 ================= -->
+  <header class="topbar">
+    <div class="brand">骗子酒馆 α版<span class="brand-sub">Liar's Bar</span>
+      <button class="rules-btn" id="rules-btn" type="button" title="游戏规则">? 规则</button>
+      <button class="rules-btn" id="sfx-btn" type="button" title="音效开关">🔊 音效</button>
+    </div>
+    <div class="conn" id="conn-status">未连接</div>
+  </header>
+  <div class="banner" id="banner" hidden>连接已断开，正在重连…</div>
+
+  <!-- ================= 大厅视图 ================= -->
+  <section class="view view-lobby" id="view-lobby">
+    <div class="lobby-panel">
+      <h1 class="lobby-title">骗子酒馆 α版</h1>
+      <p class="lobby-sub">2~4 人联机 · 每轮 5 张牌 · 一把左轮六发一弹（魔改规则，见「规则」）</p>
+
+      <div class="avatar-row">
+        <span class="avatar-box" id="my-avatar"></span>
+        <div class="avatar-btns">
+          <button class="btn btn-ghost btn-sm" id="avatar-btn" type="button">从相册选头像</button>
+          <button class="btn btn-ghost btn-sm" id="avatar-clear" type="button" hidden>清除头像</button>
+        </div>
+      </div>
+
+      <label class="field">
+        <span class="field-label">昵称</span>
+        <input id="name-input" class="input" type="text" maxlength="12" autocomplete="off"
+               placeholder="玩家" value="玩家">
+      </label>
+
+      <button class="btn btn-primary btn-block" id="join-btn" type="button">进入房间</button>
+
+      <div class="share" id="share-box" hidden>
+        <div class="share-label">把下面这个地址发给朋友（他们用 App 的「加入房间」填进去）</div>
+        <div class="share-row">
+          <input class="input share-input" id="lan-url" type="text" readonly value="">
+          <button class="btn btn-ghost" id="copy-btn" type="button">复制</button>
+          <button class="btn btn-ghost" id="lan-edit-btn" type="button" hidden>改</button>
+        </div>
+        <div class="share-hint" id="share-hint" hidden></div>
+      </div>
+
+      <div class="hint-line" id="join-hint">输入昵称后进入房间</div>
+    </div>
+
+    <div class="lobby-players">
+      <div class="lobby-players-head">
+        <span>房间成员</span>
+        <span class="count" id="lobby-count">当前 0/4 人，最少 2 人</span>
+      </div>
+      <div class="lobby-list" id="lobby-list">
+        <div class="empty">还没有人进入房间</div>
+      </div>
+      <div class="lobby-actions" id="lobby-actions">
+        <div class="wait-host" id="wait-host" hidden>等待房主开始游戏…</div>
+      </div>
+      <!-- 胜场榜（数据存在房主设备上，按设备 UID 统计，改名不影响） -->
+      <div class="board" id="board" hidden>
+        <div class="board-head">🏆 胜场榜</div>
+        <div class="board-list" id="board-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 游戏视图 ================= -->
+  <section class="view view-game" id="view-game" hidden>
+    <div class="game-container">
+
+      <!-- 对手座位（网格自动排布，人数自适应） -->
+      <div class="seats" id="seats"></div>
+
+      <!-- 中央牌桌 -->
+      <div class="table-wrap">
+        <div class="deck" id="deck" aria-hidden="true"></div>
+
+        <div class="currentCard" id="target-card">
+          <div class="target-card-inner" id="target-card-inner"></div>
+          <div class="target-card-label">本轮目标牌</div>
+        </div>
+
+        <div class="center-info">
+          <div class="phase-line">
+            <span class="phase-tag" id="phase-tag">准备中</span>
+            <span class="play-badge" id="play-badge" hidden>第 1 次出牌</span>
+          </div>
+          <div class="turn-line" id="turn-line"></div>
+          <div class="msg-line" id="msg-line"></div>
+        </div>
+      </div>
+
+      <!-- 自己：状态条 + 本轮出牌 + 手牌 + 操作 -->
+      <div class="me-wrap">
+        <div class="me-status" id="me-status"></div>
+        <div class="me-played player-played-cards" id="me-played"></div>
+        <!-- 被淘汰后转为观战：收起手牌和操作，但聊天照旧可用 -->
+        <div class="spectator-bar" id="spectator-bar" hidden>
+          👁 你已被淘汰 · 观战中（能看、能聊，但不能出牌）
+        </div>
+        <div class="cards" id="hand"></div>
+        <div class="buttons">
+          <button class="btn play-btn" id="play-btn" type="button">出牌</button>
+          <button class="btn doubt-btn" id="doubt-btn" type="button">质疑</button>
+          <button class="btn pass-btn" id="pass-btn" type="button">不要</button>
+        </div>
+      </div>
+
+      <!-- 左轮开枪特效挂载点 -->
+      <div class="revolver-layer" id="revolver-layer"></div>
+
+      <!-- 结算面板 -->
+      <div class="over-panel" id="over-panel" hidden>
+        <div class="over-card">
+          <div class="over-title">本局结束</div>
+          <div class="over-winner" id="over-winner">—</div>
+          <div class="over-sub" id="over-sub"></div>
+          <button class="btn btn-primary" id="restart-btn" type="button" hidden>再来一局</button>
+          <div class="over-wait" id="over-wait" hidden>等待房主重开…</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 改名浮层（安卓 WebView 不支持 prompt()，所以自己做一个） -->
+  <div class="rename-layer" id="rename-layer" hidden>
+    <div class="rename-card">
+      <div class="rename-title">修改名称</div>
+      <input id="rename-input" class="input" type="text" maxlength="12" autocomplete="off"
+             placeholder="新的名称">
+      <div class="rename-actions">
+        <button class="btn btn-primary" id="rename-ok" type="button">确定</button>
+        <button class="btn btn-ghost" id="rename-cancel" type="button">取消</button>
+      </div>
+      <div class="rename-tip">同一房间内重名会自动加序号（如 玩家2）</div>
+    </div>
+  </div>
+
+  <!-- 规则说明浮层（用 iframe 内嵌 rules.html：直接跳转页面会掉线） -->
+  <div class="rules-layer" id="rules-layer" hidden>
+    <div class="rules-card">
+      <button class="rules-close" id="rules-close" type="button">✕ 关闭</button>
+      <iframe class="rules-frame" id="rules-frame" title="游戏规则"></iframe>
+    </div>
+  </div>
+
+  <!-- 局内聊天（大厅和牌桌都能用） -->
+  <div class="chat" id="chat">
+    <div class="chat-panel" id="chat-panel" hidden>
+      <div class="chat-log" id="chat-log"></div>
+      <div class="chat-row">
+        <input class="input chat-input" id="chat-input" type="text" maxlength="60"
+               autocomplete="off" placeholder="说点什么（最多 60 字）">
+        <button class="btn btn-primary btn-sm" id="chat-send" type="button">发送</button>
+      </div>
+    </div>
+    <button class="chat-toggle" id="chat-toggle" type="button">💬 聊天<i class="chat-dot" id="chat-dot" hidden></i></button>
+  </div>
+
+  <!-- 修改分享地址（仅房主） -->
+  <div class="lan-layer" id="lan-layer" hidden>
+    <div class="lan-card">
+      <div class="rename-title">修改分享给朋友的地址</div>
+      <input id="lan-input" class="input" type="text" maxlength="120" autocomplete="off"
+             placeholder="例如 192.168.1.5 或 example.com:12345">
+      <div class="lan-chips" id="lan-chips"></div>
+      <div class="rename-actions">
+        <button class="btn btn-primary" id="lan-ok" type="button">保存</button>
+        <button class="btn btn-ghost" id="lan-auto" type="button">恢复自动</button>
+      </div>
+      <div class="rename-tip">可以填局域网 IP，也可以填映射出来的公网地址（异地联机用）</div>
+      <div class="rename-actions">
+        <button class="btn btn-ghost" id="lan-cancel" type="button">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 换头像用的隐藏文件输入（安卓端由 MainActivity 接管） -->
+  <input type="file" id="avatar-file" accept="image/*" hidden>
+  <!-- 轻提示 -->
+  <div class="toast-layer" id="toast-layer"></div>
+</div>
+
+<script src="js/ws.js"></script>
+<script src="js/sfx.js"></script>
+<script src="js/app.js"></script>
+<script>
+  /* 布局自检要盯的控件（见 js/uicheck.js）：真机适配回归用 */
+  window.UI_CHECK_SELECTORS = [
+    ['.topbar', 'topbar'],
+    ['.lobby-panel', 'lobbyPanel'],
+    ['.lobby-actions .btn', 'lobbyBtn'],
+    ['.lobby-list', 'lobbyList'],
+    ['.share', 'share'],
+    ['.table-wrap', 'table'],
+    ['#hand .card-shell', 'hand'],
+    ['#play-btn', 'playBtn'],
+    ['#doubt-btn', 'doubtBtn'],
+    ['#pass-btn', 'passBtn'],
+    ['.me-status', 'meStatus'],
+    ['.chat-toggle', 'chatBtn'],
+    ['#over-winner', 'overWinner'],
+    ['#restart-btn', 'restartBtn']
+  ];
+</script>
+<script src="js/uicheck.js"></script>
+</body>
+</html>

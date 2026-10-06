@@ -1,0 +1,590 @@
+/* ==========================================================================
+   table.css —— 游戏视图布局：座位自适应、中央目标牌、手牌区、结算面板
+   座位规则：自己永远在下方；1 个对手→上方；2 个→左上+右上；3 个→左上+上方+右上
+   ========================================================================== */
+
+.view-game {
+    --seat-h: clamp(74px, 20vh, 122px);
+}
+
+.game-container {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr) auto auto;
+    gap: 4px;
+    padding: clamp(4px, 0.8vh, 12px) clamp(6px, 1.4vw, 22px);
+}
+
+/* ------------------------------ 座位区 ------------------------------ */
+/*
+ * 座位区要能滑动：轮到自己时提示行会变长、下面两行被撑高，
+ * 这一行（1fr）会被压缩，配合 overflow:hidden 就会把上面的名字裁掉。
+ * 所以这里给每行兜住一个自然高度，超出就纵向滚动，滑一下就能看到。
+ */
+.seats {
+    grid-row: 1;
+    position: relative;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 1fr;
+    grid-auto-rows: minmax(var(--seat-h), auto);
+    gap: clamp(3px, 0.5vw, 10px);
+    align-items: stretch;
+    justify-items: center;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+}
+
+.seat {
+    --card-w: 30px;
+    --card-h: 42px;
+    width: 100%;
+    max-width: 320px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 4px 6px;
+    border: 2px solid transparent;
+    border-radius: var(--radius);
+    background: rgba(0, 0, 0, 0.22);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, filter 0.2s ease;
+    overflow: hidden;
+}
+
+/* 座位所在的网格列由 JS 通过 data-slot 指定 */
+.seat[data-slot="left"]   { grid-column: 1; grid-row: 1; }
+.seat[data-slot="center"] { grid-column: 2; grid-row: 1; }
+.seat[data-slot="right"]  { grid-column: 3; grid-row: 1; }
+
+/* 当前回合高亮 */
+.seat.is-turn {
+    border-color: var(--gold);
+    background: rgba(255, 209, 102, 0.12);
+    box-shadow: 0 0 12px rgba(255, 209, 102, 0.5), inset 0 0 14px rgba(255, 209, 102, 0.12);
+    animation: seat-turn 1.4s ease-in-out infinite;
+}
+
+@keyframes seat-turn {
+    0%, 100% { box-shadow: 0 0 10px rgba(255, 209, 102, 0.4), inset 0 0 12px rgba(255, 209, 102, 0.1); }
+    50%      { box-shadow: 0 0 20px rgba(255, 209, 102, 0.8), inset 0 0 18px rgba(255, 209, 102, 0.2); }
+}
+
+/* 淘汰：置灰 + 打叉 */
+.seat.is-dead {
+    filter: grayscale(100%);
+    opacity: 0.45;
+}
+
+.seat.is-dead .seat-name::after {
+    content: "✕";
+    color: var(--danger);
+    margin-left: 6px;
+    font-weight: 800;
+}
+
+/* 掉线中 */
+.seat.is-offline {
+    opacity: 0.6;
+    border-style: dashed;
+    border-color: var(--ink-dim);
+}
+
+.seat-head {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    max-width: 100%;
+    flex-wrap: wrap;
+}
+
+.seat-name {
+    font-weight: 700;
+    font-size: clamp(12px, 0.8vw + 8px, 15px);
+    color: var(--ink);
+    max-width: 9em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.seat-turn-tag {
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 8px;
+    background: var(--gold);
+    color: #3a2a00;
+    font-weight: 700;
+}
+
+.badge {
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 8px;
+    border: 1px solid currentColor;
+    color: var(--ink-dim);
+    white-space: nowrap;
+}
+
+.badge-off {
+    color: #ffcf8a;
+    animation: banner-pulse 1.6s ease-in-out infinite;
+}
+
+.badge-host {
+    color: var(--gold);
+}
+
+.badge-self {
+    color: var(--accent);
+}
+
+.seat-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--ink-dim);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* 左轮弹位：6 个小圆点，实心 = 已扣扳机 */
+.shots {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.shots .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.shots .dot.is-used {
+    background: var(--danger);
+    border-color: var(--danger);
+    box-shadow: 0 0 6px rgba(255, 107, 107, 0.8);
+}
+
+.shots .shots-text {
+    margin-left: 4px;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+}
+
+.seat-handcount {
+    white-space: nowrap;
+}
+
+.seat-alive {
+    white-space: nowrap;
+    color: var(--green-light);
+}
+
+.seat.is-dead .seat-alive {
+    color: var(--danger);
+}
+
+/* ------------------------------ 中央牌桌 ------------------------------ */
+.table-wrap {
+    grid-row: 2;
+    position: relative;
+    justify-self: center;
+    width: 100%;
+    max-width: 680px;
+    height: clamp(96px, 26vh, 168px);
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    grid-template-areas: "deck card info";
+    align-items: center;
+    justify-items: center;
+    gap: clamp(6px, 1.6vw, 26px);
+    padding: clamp(4px, 1vh, 10px) clamp(8px, 2vw, 20px);
+    border-radius: 14px;
+    background:
+        radial-gradient(ellipse at 50% 50%, rgba(139, 195, 74, 0.16), rgba(255, 255, 255, 0) 70%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(0, 0, 0, 0.18));
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 6px 22px rgba(0, 0, 0, 0.45), 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+/* 当前回合指向牌桌的指针线（纯装饰，指向 left / center / right 座位） */
+.table-wrap::before {
+    content: "";
+    position: absolute;
+    top: -9px;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-bottom: 9px solid rgba(255, 209, 102, 0.85);
+    transform: translateX(-50%) scale(0.9);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.table-wrap.has-turn::before {
+    opacity: 1;
+}
+
+/* ------------------------------ 目标牌 ------------------------------ */
+.currentCard {
+    grid-area: card;
+    position: relative;
+    width: clamp(56px, 11vh, 84px);
+    height: clamp(78px, 15.5vh, 118px);
+    border-radius: 8px;
+    background: #ffffff;
+    border: 3px solid var(--green);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5), 0 0 20px rgba(76, 175, 80, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: rotate(-2deg);
+    animation: target-pop 0.4s cubic-bezier(0.2, 1.4, 0.5, 1) both;
+}
+
+@keyframes target-pop {
+    from { transform: rotate(-2deg) scale(0.72); opacity: 0.2; }
+    to   { transform: rotate(-2deg) scale(1); opacity: 1; }
+}
+
+.currentCard.is-empty {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.25);
+    box-shadow: none;
+    animation: none;
+}
+
+.target-card-inner {
+    font-size: clamp(34px, 7.6vh, 58px);
+    font-weight: 800;
+    color: var(--card-ink);
+    line-height: 1;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.currentCard.is-empty .target-card-inner {
+    font-size: clamp(18px, 3.4vh, 26px);
+    color: var(--ink-dim);
+}
+
+.currentCard.is-red .target-card-inner {
+    color: var(--card-red);
+}
+
+.target-card-label {
+    position: absolute;
+    left: 50%;
+    bottom: -17px;
+    transform: translateX(-50%);
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--ink-dim);
+    white-space: nowrap;
+}
+
+.currentCard.is-empty .target-card-label {
+    display: none;
+}
+
+/* ------------------------------ 中央提示 ------------------------------ */
+.center-info {
+    grid-area: info;
+    align-self: center;
+    justify-self: start;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.phase-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.phase-tag {
+    font-size: clamp(10px, 0.7vw + 7px, 12px);
+    padding: 2px 9px;
+    border-radius: 10px;
+    background: rgba(139, 195, 74, 0.2);
+    border: 1px solid var(--green-light);
+    color: #d9f5c8;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.play-badge {
+    font-size: clamp(10px, 0.7vw + 7px, 12px);
+    padding: 2px 9px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    white-space: nowrap;
+}
+
+.turn-line {
+    font-size: clamp(11px, 0.9vw + 8px, 15px);
+    font-weight: 700;
+    color: var(--gold);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 34vw;
+}
+
+.msg-line {
+    font-size: clamp(10px, 0.7vw + 7px, 13px);
+    color: var(--ink-dim);
+    max-width: 34vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ------------------------------ 自己（底部） ------------------------------ */
+.me-wrap {
+    grid-row: 3;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    width: 100%;
+}
+
+.me-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    min-height: 20px;
+    font-size: clamp(10px, 0.7vw + 7px, 13px);
+    color: var(--ink-dim);
+}
+
+.me-name {
+    font-weight: 700;
+    color: var(--accent);
+    font-size: clamp(11px, 0.8vw + 8px, 14px);
+}
+
+/* 自己的出牌区 */
+.me-played {
+    min-height: calc(var(--card-h) * 0.7);
+}
+
+/* 手牌区 */
+.cards {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 6px 4px;
+    min-height: calc(var(--card-h) + 16px);
+    --card-w: clamp(34px, 5vh, 50px);
+    --card-h: clamp(48px, 7vh, 70px);
+    flex-wrap: nowrap;
+    max-width: 96vw;
+}
+
+.cards .card-shell {
+    transition: transform 0.18s ease;
+}
+
+.cards .card {
+    cursor: pointer;
+}
+
+/* 选中的手牌上移（沿用原有 move-up 命名） */
+.cards .card.move-up,
+.cards .card-shell.is-selected .card {
+    transform: translateY(-16px) scale(1.05);
+    border-color: var(--accent);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45), 0 0 14px rgba(116, 241, 9, 0.55);
+}
+
+.cards .card.move-up .card-value,
+.cards .card-shell.is-selected .card-value {
+    color: var(--green-deep);
+}
+
+.cards.is-locked .card {
+    cursor: not-allowed;
+}
+
+/* 手牌区可以出的牌（目标牌或赖子 J）：底部一条淡绿提示 */
+.cards .hand-card.is-playable {
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35), inset 0 -3px 0 rgba(76, 175, 80, 0.45);
+}
+
+/* 操作按钮 */
+.buttons {
+    display: flex;
+    gap: clamp(10px, 2vw, 24px);
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 2px;
+}
+
+/* ------------------------------ 结算面板 ------------------------------ */
+.over-panel {
+    position: absolute;
+    inset: 0;
+    z-index: 120;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(6, 12, 8, 0.72);
+    backdrop-filter: blur(3px);
+    animation: over-in 0.25s ease-out;
+}
+
+@keyframes over-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.over-card {
+    min-width: min(78vw, 320px);
+    padding: clamp(14px, 3vh, 26px) clamp(18px, 4vw, 34px);
+    border-radius: 16px;
+    text-align: center;
+    background: linear-gradient(180deg, #2b3b2e, #1b2820);
+    border: 2px solid var(--green);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6), 0 0 26px rgba(76, 175, 80, 0.35);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.over-title {
+    font-size: clamp(12px, 0.9vw + 8px, 15px);
+    letter-spacing: 3px;
+    color: var(--ink-dim);
+}
+
+.over-winner {
+    font-size: clamp(20px, 2.4vw + 10px, 34px);
+    font-weight: 800;
+    color: var(--gold);
+    text-shadow: 0 0 16px rgba(255, 209, 102, 0.5);
+    max-width: 80vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.over-sub {
+    font-size: clamp(11px, 0.8vw + 8px, 14px);
+    color: var(--ink-dim);
+}
+
+.over-wait {
+    font-size: clamp(11px, 0.8vw + 8px, 14px);
+    color: var(--ink-dim);
+    animation: banner-pulse 1.8s ease-in-out infinite;
+}
+
+/* ------------------------------ 窄屏适配 ------------------------------ */
+/* 竖屏（非主要场景）：牌桌竖排，仍不出现滚动条 */
+@media (orientation: portrait) {
+    .game-container {
+        grid-template-rows: minmax(0, 1fr) auto auto;
+    }
+    .seats {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+    .table-wrap {
+        height: clamp(104px, 18vh, 150px);
+        grid-template-columns: auto auto 1fr;
+    }
+    .turn-line,
+    .msg-line {
+        max-width: 40vw;
+    }
+}
+
+/* 极窄横屏（640px 高以内）：压缩牌桌与状态行 */
+@media (max-height: 520px) {
+    .table-wrap {
+        height: clamp(88px, 25vh, 130px);
+        gap: clamp(6px, 1.2vw, 16px);
+    }
+    .seat {
+        padding: 2px 4px;
+        gap: 1px;
+    }
+    .me-status {
+        min-height: 16px;
+    }
+    .cards {
+        padding: 6px 4px 2px;
+        min-height: calc(var(--card-h) + 10px);
+    }
+}
+
+/* ==================================================================
+   观战（被淘汰后）：收起手牌与操作，只留牌桌和状态条
+   ================================================================== */
+.view-table.is-spectator .me-wrap .cards,
+.view-table.is-spectator .me-wrap .buttons,
+.view-table.is-spectator .me-wrap .me-played {
+    display: none;
+}
+
+.spectator-bar {
+    align-self: center;
+    margin: 2px 0 4px;
+    padding: 5px 14px;
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.55);
+    border: 1px dashed rgba(255, 209, 102, 0.65);
+    color: var(--gold);
+    font-size: clamp(11px, 0.8vw + 8px, 14px);
+    letter-spacing: 0.03em;
+    animation: spec-in 0.35s ease-out both;
+}
+
+@keyframes spec-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: none; }
+}
+
+/* 观战时聊天框样式上也明确"不可用" */
+.chat-input:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+/* ==================================================================
+   座位方框里的「已出 N 张」——和手牌数、存活状态并排显示
+   ================================================================== */
+.seat-played,
+.seat-meta .seat-played,
+.me-status .seat-played {
+    color: var(--gold);
+    font-weight: 600;
+}
+
+.seat-played::before {
+    content: '🂠 ';
+}

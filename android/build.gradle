@@ -1,0 +1,6 @@
+// 根工程构建脚本。
+// 这里只声明插件版本，不 apply（各模块自行 apply），AGP 与 Gradle 版本严格配对：
+//   Gradle 8.7  <-->  Android Gradle Plugin 8.5.2
+plugins {
+    id 'com.android.application' version '8.5.2' apply false
+}

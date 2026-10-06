@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>骗子酒馆 α版 · 规则说明</title>
+<style>
+  :root {
+    --green: #4caf50;
+    --accent: #74f109;
+    --panel: #212f24;
+    --bg: #0f1712;
+    --line: rgba(255, 255, 255, 0.14);
+    --ink: #eef6ee;
+    --ink-dim: #a9bda9;
+    --gold: #ffd166;
+    --danger: #ff6b6b;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: radial-gradient(circle at 50% 0%, #1b2c20 0%, var(--bg) 70%);
+    color: var(--ink);
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    font-size: 15px; line-height: 1.75;
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 16px 18px 40px; }
+  h1 { font-size: 22px; margin: 6px 0 2px; letter-spacing: 1px; }
+  .lead { color: var(--ink-dim); font-size: 13px; margin: 0 0 18px; }
+  h2 {
+    font-size: 16px; margin: 26px 0 8px; color: var(--accent);
+    border-left: 3px solid var(--green); padding-left: 9px;
+  }
+  p { margin: 8px 0; }
+  ul, ol { margin: 8px 0; padding-left: 22px; }
+  li { margin: 5px 0; }
+  b, strong { color: var(--gold); font-weight: 600; }
+  em { color: var(--accent); font-style: normal; }
+  code {
+    background: #16261b; border: 1px solid var(--line); border-radius: 5px;
+    padding: 1px 6px; font-size: 13px; color: var(--gold);
+  }
+  .box {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 10px; padding: 12px 14px; margin: 12px 0;
+  }
+  .box.warn { border-color: rgba(255, 107, 107, .45); }
+  .box.tip { border-color: rgba(116, 241, 9, .35); }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--line); padding: 7px 9px; text-align: left; vertical-align: top; }
+  th { background: #16261b; color: var(--ink-dim); font-weight: 600; }
+  .back {
+    display: inline-block; margin-top: 26px; padding: 11px 20px;
+    background: var(--green); color: #08130a; border: none; border-radius: 9px;
+    font-size: 15px; font-weight: 700; text-decoration: none; cursor: pointer;
+    font-family: inherit;
+  }
+  .back:active { background: #3f9142; }
+  .foot { color: var(--ink-dim); font-size: 12px; margin-top: 26px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>骗子酒馆 α版 · 规则说明</h1>
+  <p class="lead">2~4 人 · 每轮 5 张牌 · 一把左轮六发一弹 · 活到最后的人赢</p>
+
+  <div class="box">
+    <b>关于这个版本：</b>这是参考《Liar's Bar》纸牌模式做的<b>魔改版（α版）</b>，
+    规则和原作<b>不完全一样</b>。除了「扣着牌吹牛、质疑就翻牌、谁错谁挨枪」这个核心之外，
+    我们还加了：<b>可以「不要」过牌</b>、<b>两圈没人质疑就作废重开</b>、
+    <b>下一轮由判断正确的人先出</b>、<b>胜场榜</b>、<b>观战</b> 等等。
+    以本页为准，不要拿原作的规则来对照。
+  </div>
+
+  <div class="box tip">
+    <b>一句话玩法：</b>轮到你时，要么<b>扣着牌吹牛</b>说"这是目标牌"，要么
+    <b>质疑上家</b>说他撒谎。被拆穿的人（或者冤枉别人的人）要拿左轮对自己开一枪。
+  </div>
+
+  <h2>一、牌与目标牌</h2>
+  <ul>
+    <li>牌堆共 <b>20 张</b>：Q × 6、K × 6、A × 6，外加 <b>2 张小丑牌 🃏</b>。</li>
+    <li>每一轮开始会从 <b>Q / K / A</b> 里随机指定一张作为<em>目标牌</em>（左上角大字显示）。</li>
+    <li>每人每轮发 <b>5 张</b>手牌。</li>
+    <li><b>小丑牌是万能的</b>：可以当任意目标牌打出去，也可以跟着真目标牌一起出。
+      手里有小丑牌就是最大的底气，建议留到关键回合。</li>
+  </ul>
+
+  <h2>二、轮到你时能做什么</h2>
+  <p>轮到你的时候，桌面上有三种选择，任选其一：</p>
+  <table>
+    <tr><th>选择</th><th>说明</th><th>怎么点</th></tr>
+    <tr>
+      <td><b>出牌</b></td>
+      <td>选 <b>1~5 张</b>牌扣着打出去（牌面只有你自己看得到）。<br>
+          不要求真的是目标牌 —— 你可以<b>随便吹牛</b>，这就是游戏的核心。</td>
+      <td>点手牌选中 → 点「出牌」</td>
+    </tr>
+    <tr>
+      <td><b>质疑上家</b></td>
+      <td>说"他刚才那手是假的"。翻牌判定见下一节。</td>
+      <td>点「质疑」</td>
+    </tr>
+    <tr>
+      <td><b>不要（过牌）</b></td>
+      <td>这一手我不打，让给下家。<b>上家的牌仍然留在桌上，下家照样可以质疑他。</b><br>
+          手里全是废牌、又不想硬吹牛的时候，这招很实用。</td>
+      <td>点「不要」</td>
+    </tr>
+  </table>
+  <ul>
+    <li>系统会校验：必须真的是手里的牌、必须是 1~5 张，不能越位出牌。</li>
+    <li>注意：<b>「不要」不等于安全</b>。你只是把决定权交给下家，
+      而他完全可以选择质疑上家——也包括质疑你刚才没打的那些牌。</li>
+  </ul>
+
+  <h2>三、质疑（开他！）</h2>
+  <ul>
+    <li><b>只有当前回合的玩家</b>能质疑，而且只能质疑<b>上家</b>（最近出牌的那个人）。</li>
+    <li>质疑后，上家刚打出的那几张牌会被<b>当众翻开</b>：
+      先蹦出「異議あり！」，接着亮牌并宣判，最后才进左轮那一枪。
+      <b>这整段演出播完之前，谁都不能出牌</b>，所以不会出现"牌都翻完了下家又打了一张"的混乱。</li>
+    <li>判定规则：<b>只要有一张</b>既不是目标牌、也不是小丑牌，就算他撒谎。</li>
+  </ul>
+
+  <table>
+    <tr><th>翻牌结果</th><th>谁挨枪</th><th>下一轮谁先出</th></tr>
+    <tr><td>上家撒谎了（<b>质疑成功</b>）</td><td><b>出牌的人</b>对自己开一枪</td>
+        <td><b>质疑的人</b>（他判断对了）</td></tr>
+    <tr><td>上家确实（全是目标牌 / 小丑牌）</td><td><b>质疑的人</b>对自己开一枪</td>
+        <td><b>出牌的人</b>（他说的是真话）</td></tr>
+  </table>
+  <p class="lead">
+    一句话记住：<b>下一轮由"这一手判断正确"的那个人先出</b>。
+    质疑成功你先出，被冤枉了对方先出 —— 谁读牌读得准，谁拿先手。
+  </p>
+
+  <h2>四、左轮手枪</h2>
+  <ul>
+    <li>每人有自己的左轮：<b>6 个弹位，其中 1 发实弹</b>。</li>
+    <li>实弹位置是<b>固定的</b>：从第一枪开始数，<b>第 1~6 枪之内必定命中一次</b>，中间不会重新转轮。</li>
+    <li>每个人名字下面那 6 个小圆点就是 <b>x/6</b>：已经扣过几次扳机。到了 5/6，下一枪必中。</li>
+    <li>中枪 = 淘汰。淘汰之后你就是<b>观战者</b>：还能看别人打、也能继续聊天吐槽，只是不能再出牌或质疑。</li>
+  </ul>
+
+  <h2>五、一轮什么时候结束</h2>
+  <ul>
+    <li><b>有人质疑并开了枪</b> → 本轮结束。</li>
+    <li><b>所有人都把手牌打完了</b> → 本轮也结束（没人质疑就没人挨枪）。</li>
+    <li><b>牌转了两圈都没人质疑</b> → 这一轮<b>作废重开</b>：谁都不用挨枪，
+        重新发牌、重新指定目标牌。（防止大家一直互相"不要"把时间耗光。）</li>
+    <li>新一轮会重新发 5 张牌、重新指定目标牌，先出的人按上一节的规则决定。</li>
+    <li>出完手牌的玩家，本轮会被跳过；只要没人质疑他，他这轮就安全了。</li>
+  </ul>
+
+  <h2>六、胜负与胜场榜</h2>
+  <p>场上<b>只剩最后 1 名存活玩家</b>时结束，他获胜。结算面板会显示赢家，房主可以点「再来一局」重开。
+     胜利画面会等<b>开枪那一枪的动画播完</b>才出来，不会把中枪的瞬间盖掉。</p>
+
+  <div class="box tip">
+    <b>胜场榜（大厅右下角）：</b>
+    <ul>
+      <li>每赢一局记 1 胜，按<b>设备</b>统计 —— 每台设备第一次打开游戏时会生成一个
+          <b>内置 UID</b> 存在本机，之后<b>改名、换头像、断线重连都不会变</b>，
+          所以"张三"改名成"赌神"之后，胜场还是他自己的。</li>
+      <li>排行榜数据存在<b>房主那台设备</b>上（服务端只在内存里维护一份，
+          房主每次进房会把自己存的账本交上去恢复）。换房主不用管，规则是自动的。</li>
+      <li>只统计<b>名次</b>，不记录对局内容；换设备就要重新累积。</li>
+    </ul>
+  </div>
+
+  <h2>七、谁当房主、电脑端是什么角色</h2>
+  <ul>
+    <li><b>房主 = 第一个连进房间的那台设备</b>。房主才能「开始游戏」「添加机器人」「改分享地址」。</li>
+    <li>房主中途退出（掉线超过 60 秒被清掉），房主身份会<b>自动顺延</b>给剩下最早进来的那位，房间不会卡住。</li>
+    <li><b>电脑端（服务端 JAR）只是个服务器</b>：它自己<b>不占座位、不参与游戏</b>。
+        你在电脑上跑服务端 + 端口映射，就是为了让异地的朋友能连进来；
+        真正管事的是<b>第一个连进来的手机</b>。</li>
+    <li>手机自己开服时也一样：手机打开启动页点「进入牌桌」才算入座，
+        如果先用 <code>host_only</code> 模式启动，手机就只当服务器，4 个位置全留给别人。</li>
+  </ul>
+
+  <h2>八、人数与机器人</h2>
+  <ul>
+    <li><b>2~4 人</b>都能开局，人数够了房主点「开始游戏」即可（不用等满 4 人）。</li>
+    <li>缺人时房主可以点 <b>「＋ 添加机器人」</b>补齐，<b>一个人也能开局</b>。</li>
+    <li>机器人会自己看牌、出牌、质疑，偶尔也会「不要」过牌；
+        它和真人走完全相同的规则判定，不会作弊。</li>
+    <li>只有大厅阶段能加/减机器人；对局中不能改名单。</li>
+    <li><b>被淘汰 = 观战</b>：手牌和按钮会收起来，只剩牌桌和战况；
+        <b>但聊天照旧可用</b> —— 观战只是不能出牌/质疑，想吐槽随时发。</li>
+  </ul>
+
+  <h2>九、怎么操作</h2>
+  <table>
+    <tr><th>操作</th><th>手机上</th><th>电脑上</th></tr>
+    <tr><td>选出牌</td><td>点手牌（最多 5 张，再点取消）</td><td>点手牌，或按数字键</td></tr>
+    <tr><td>出牌</td><td>点「出牌」</td><td>点「出牌」或按空格</td></tr>
+    <tr><td>质疑</td><td>点「质疑」</td><td>点「质疑」或按 D</td></tr>
+    <tr><td>不要（过牌）</td><td>点「不要」</td><td>点「不要」或按 P</td></tr>
+    <tr><td>改名</td><td colspan="2">大厅里改（对局中不允许改名）</td></tr>
+    <tr><td>聊天</td><td colspan="2">点右下角「💬 聊天」展开输入框（被淘汰后也能聊）</td></tr>
+  </table>
+
+  <h2>十、几个小技巧</h2>
+  <ul>
+    <li>手里目标牌和小丑牌越多，别人手里就越少 —— 这时候质疑更容易成功。</li>
+    <li><b>质疑成功能抢到下一轮先手</b>，所以别怕开人；但开错了要自己挨枪。</li>
+    <li>一次出 5 张比出 1 张更容易被质疑，但能更快把手牌出完。</li>
+    <li>手里全是废牌时，用「不要」过牌比硬吹牛更安全 —— 但两圈都没人质疑的话，
+        这轮会作废重开，拖不出好处。</li>
+    <li>只剩两个人时，最后那手牌如果是假的，很可能被对方开掉，自己反而挨枪。</li>
+    <li>小丑牌 🃏 很值钱，能留就留到关键回合再用。</li>
+  </ul>
+
+  <h2>十一、常见问题</h2>
+  <div class="box">
+    <p><b>为什么我点不了「质疑」？</b><br>
+      质疑只能由<em>当前回合的玩家</em>对上家发起。还没轮到你、或者本轮还没人出牌时都不行。</p>
+    <p><b>为什么改名按钮不见了？</b><br>
+      对局进行中不允许改名，避免牌桌上认不出谁是谁。等这一局结束就能改。</p>
+    <p><b>为什么会自动跳过某个玩家？</b><br>
+      他已经把手牌出完了，本轮被跳过；或者他掉线超过了 60 秒。</p>
+    <p><b>朋友怎么进来？</b><br>
+      房主在大厅把「局域网地址」发给朋友，他们用同一个 App 的「加入房间」填进去即可；
+      异地联机就让房主用端口映射工具把端口开放出去，把映射出来的地址发给他们。</p>
+  </div>
+
+  <button class="back" id="back-btn" type="button">返回</button>
+  <p class="foot">参考原作：Steam《Liar's Bar》纸牌模式。本实现为 2~4 人适配版本。</p>
+</div>
+
+<script>
+  document.getElementById('back-btn').onclick = function () {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      location.href = '/';
+    }
+  };
+</script>
+</body>
+</html>

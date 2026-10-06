@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  纯 XML 布局，不需要 androidx。
+  WebView 铺满；statusText 是覆盖在上面的黑底提示层（启动中 / 加载中 / 出错）。
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black">
+
+    <WebView
+        android:id="@+id/webView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/black" />
+
+    <TextView
+        android:id="@+id/statusText"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/black"
+        android:gravity="center"
+        android:lineSpacingExtra="6dp"
+        android:padding="32dp"
+        android:text="@string/status_starting"
+        android:textColor="@android:color/white"
+        android:textSize="18sp" />
+
+</FrameLayout>

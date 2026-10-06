@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  状态栏小图标：必须是「不透明区域 = 图形」的纯白剪影，
+  系统会自动着色。这里画一把左轮手枪的轮廓。
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- 枪管 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M3,7 L16,7 L16,10 L3,10 Z" />
+    <!-- 弹巢 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M14,5 L19,5 A3,3 0 0,1 19,11 L14,11 A3,3 0 0,1 14,5 Z" />
+    <!-- 握把 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M11,10 L16,10 L14,20 L9,20 Z" />
+    <!-- 扳机护圈 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M9,11 L11,11 L11,13 A2,2 0 0,1 9,13 Z" />
+
+</vector>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--
+      直接用系统 Material 主题，不需要 androidx/appcompat。
+      Theme.Material.NoActionBar.Fullscreen 从 API 21 起就有。
+      true 表示「没有 ActionBar」，适合全屏游戏。
+    -->
+    <style name="AppTheme" parent="@android:style/Theme.Material.NoActionBar.Fullscreen">
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:colorBackground">@android:color/black</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+</resources>

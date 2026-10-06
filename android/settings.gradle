@@ -1,0 +1,22 @@
+// 骗子酒馆 Android 壳工程（纯 Java，零第三方依赖）
+// 只依赖 Android Gradle Plugin 与其传递依赖（Gradle 插件门户 / Google Maven）。
+
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.name = "liarbar-android"
+
+include ':app'

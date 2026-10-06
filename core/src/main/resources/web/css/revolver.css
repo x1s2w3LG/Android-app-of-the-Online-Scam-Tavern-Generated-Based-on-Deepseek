@@ -1,0 +1,132 @@
+/* ==========================================================================
+   revolver.css —— 左轮手枪与开枪特效
+   依据 #revolver-layer 上的方向类摆放枪口指向的座位
+   ========================================================================== */
+
+.revolver-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 110;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/* 单次开枪特效：绝对定位到目标座位中心，用 transform 反向偏移 */
+.shot-effect {
+    position: absolute;
+    width: clamp(92px, 16vh, 150px);
+    height: clamp(92px, 16vh, 150px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.6));
+    transition: none;
+}
+
+.shot-effect .revolver {
+    width: 100%;
+    height: 100%;
+    transition: none;
+    stroke: #2b2b2b;
+    stroke-width: 2;
+    fill: #6e6e6e;
+}
+
+/* 指向座位（用 rotate 让枪口朝目标，自己朝上、对手朝下，侧边旋转 90°) */
+.shot-effect.point-to-top    { transform: translate(-50%, -50%) rotate(180deg); }
+.shot-effect.point-to-bottom { transform: translate(-50%, -50%) rotate(0deg); }
+.shot-effect.point-to-left   { transform: translate(-50%, -50%) rotate(90deg); }
+.shot-effect.point-to-right  { transform: translate(-50%, -50%) rotate(-90deg); }
+
+/* 开枪抖动动画（rotate 已用于指向，抖动放在内层 svg 上） */
+.shot-effect.is-fire .revolver {
+    animation: revolver-fire 0.55s cubic-bezier(0.3, 1.4, 0.5, 1) both;
+}
+
+@keyframes revolver-fire {
+    0%   { transform: translateX(0) rotate(0deg) scale(1); }
+    18%  { transform: translateX(-9px) rotate(-16deg) scale(1.08); }
+    32%  { transform: translateX(5px) rotate(10deg) scale(1.02); }
+    46%  { transform: translateX(-3px) rotate(-5deg) scale(1); }
+    100% { transform: translateX(0) rotate(0deg) scale(1); }
+}
+
+/* 弹筒旋转（开枪前） */
+.shot-effect .revolver .cylinder {
+    transform-origin: 40px 50px;
+    animation: cylinder-spin 0.5s linear both;
+}
+
+@keyframes cylinder-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+/* 中弹闪光覆盖整层 */
+.shot-flash {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at var(--fx, 50%) var(--fy, 50%),
+                rgba(255, 240, 180, 0.95) 0%,
+                rgba(255, 90, 70, 0.55) 22%,
+                rgba(255, 60, 40, 0) 58%);
+    z-index: 111;
+    pointer-events: none;
+    animation: shot-flash 0.45s ease-out both;
+}
+
+@keyframes shot-flash {
+    0%   { opacity: 0; }
+    12%  { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* 空响（未命中）：小抖动 + 金属灰闪 */
+.shot-effect.is-dry .revolver {
+    animation: revolver-dry 0.4s ease-in-out both;
+}
+
+@keyframes revolver-dry {
+    0%, 100% { transform: translateX(0); }
+    25%      { transform: translateX(-3px) rotate(-3deg); }
+    60%      { transform: translateX(3px) rotate(3deg); }
+}
+
+/* 命中提示文字（嘭！淘汰） */
+.impact-text {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    z-index: 130;
+    transform: translate(-50%, -50%);
+    font-size: clamp(24px, 4vw + 12px, 52px);
+    font-weight: 800;
+    letter-spacing: 4px;
+    color: #fff2c2;
+    text-shadow: 0 0 12px rgba(255, 120, 60, 0.95), 0 0 30px rgba(255, 60, 40, 0.7), 0 4px 10px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+    animation: impact-pop 1.05s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+    white-space: nowrap;
+}
+
+.impact-text.is-dry {
+    color: #dfe6e0;
+    font-size: clamp(18px, 2.6vw + 10px, 34px);
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.9), 0 3px 8px rgba(0, 0, 0, 0.8);
+}
+
+@keyframes impact-pop {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.4) rotate(-6deg); }
+    22%  { opacity: 1; transform: translate(-50%, -50%) scale(1.16) rotate(2deg); }
+    38%  { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+    78%  { opacity: 1; }
+    100% { opacity: 0; transform: translate(-50%, -62%) scale(1); }
+}
+
+/* 游戏中通用的手枪图标（座位旁的小标记，可选） */
+.revolver {
+    width: 100%;
+    height: 100%;
+}

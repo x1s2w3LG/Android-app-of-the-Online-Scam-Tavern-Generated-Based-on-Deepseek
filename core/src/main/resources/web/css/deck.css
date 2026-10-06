@@ -1,0 +1,215 @@
+/* ==========================================================================
+   deck.css —— 牌堆、卡牌（手牌 / 出牌 / 目标牌）、翻面效果
+   沿用原有设计：绿色卡背、白色卡面、圆角 + 阴影
+   ========================================================================== */
+
+:root {
+    --card-w: 44px;
+    --card-h: 60px;
+}
+
+/* ------------------------------ 牌堆 ------------------------------ */
+.deck {
+    grid-area: deck;
+    position: relative;
+    justify-self: center;
+    align-self: center;
+    width: var(--card-w);
+    height: var(--card-h);
+    flex: 0 0 auto;
+}
+
+.deck .deck-card {
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background:
+        repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.12) 0 4px, rgba(255, 255, 255, 0) 4px 8px),
+        linear-gradient(160deg, #5cbc60, var(--green-dark));
+    background-color: var(--green);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+}
+
+.deck .deck-card:nth-child(1) { transform: translate(0, 0) rotate(0deg); }
+.deck .deck-card:nth-child(2) { transform: translate(-2px, -3px) rotate(-3deg); }
+.deck .deck-card:nth-child(3) { transform: translate(-4px, -6px) rotate(-6deg); }
+.deck .deck-card:nth-child(4) { transform: translate(-6px, -9px) rotate(-9deg); }
+.deck .deck-card:nth-child(5) { transform: translate(-8px, -12px) rotate(-12deg); }
+
+.deck .deck-count {
+    position: absolute;
+    left: 50%;
+    bottom: -16px;
+    transform: translateX(-50%);
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--ink-dim);
+    white-space: nowrap;
+}
+
+/* ------------------------------ 通用卡牌 ------------------------------ */
+.card {
+    position: relative;
+    width: var(--card-w);
+    height: var(--card-h);
+    flex: 0 0 auto;
+    border-radius: 6px;
+    background: var(--card-bg);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+    border: 2px solid #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.card .card-value {
+    font-size: calc(var(--card-h) * 0.56);
+    font-weight: 800;
+    color: var(--card-ink);
+    line-height: 1;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.card.is-target {
+    border-color: var(--gold);
+    box-shadow: 0 0 10px rgba(255, 209, 102, 0.55);
+}
+
+.card.is-red .card-value {
+    color: var(--card-red);
+}
+
+.card:hover {
+    transform: translateY(-4px) scale(1.03);
+}
+
+/* 卡背（出牌区背面朝上） */
+.card-back {
+    position: absolute;
+    inset: 0;
+    border-radius: 4px;
+    border: 2px solid #ffffff;
+    background-color: var(--green);
+    background-image:
+        repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.16) 0 5px, rgba(255, 255, 255, 0) 5px 10px),
+        linear-gradient(160deg, #6fce74, var(--green-dark));
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.85);
+    letter-spacing: 1px;
+}
+
+.card-back::after {
+    content: "";
+    width: 42%;
+    height: 42%;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    border-radius: 3px;
+    transform: rotate(45deg);
+}
+
+/* ------------------------------ 出牌区 ------------------------------ */
+.player-played-cards {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-height: calc(var(--card-h) * 0.8);
+    --card-w: 36px;
+    --card-h: 50px;
+}
+
+/* 某个玩家本轮的所有出牌（可能是一次出多张，也可能是多次出牌） */
+.played-block {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+    gap: 3px;
+    padding: 2px;
+    border-radius: 8px;
+}
+
+.player-played-cards .card {
+    cursor: default;
+}
+
+.player-played-cards .card:hover {
+    transform: none;
+}
+
+/* 已翻开的牌：绿色描边 = 诚实，红色描边 = 撒谎 */
+.played-card.is-honest {
+    border-color: var(--green-light);
+    box-shadow: 0 0 12px rgba(139, 195, 74, 0.75);
+}
+
+.played-card.is-lie {
+    border-color: var(--danger);
+    box-shadow: 0 0 14px rgba(255, 107, 107, 0.85);
+}
+
+.played-card.is-joker {
+    border-color: #9b8cff;
+    box-shadow: 0 0 10px rgba(155, 140, 255, 0.6);
+}
+
+/* 出牌时的“飞入”动画 */
+.played-card.deal-in {
+    animation: deal-in 0.26s cubic-bezier(0.2, 1.2, 0.4, 1) both;
+}
+
+@keyframes deal-in {
+    from { opacity: 0; transform: translateY(-26px) scale(0.7) rotate(-8deg); }
+    to   { opacity: 1; transform: none; }
+}
+
+/* 翻面（3D 翻转） */
+.played-card.flip-anim {
+    animation: flip-anim 0.5s ease both;
+}
+
+@keyframes flip-anim {
+    0%   { transform: rotateY(0deg); }
+    100% { transform: rotateY(360deg); }
+}
+
+/* 侧边座位（左上 / 右上）的出牌区与牌整体旋转，沿用原有观感 */
+.seat-side-left .player-played-cards .card-shell {
+    transform: rotate(-90deg);
+}
+
+.seat-side-right .player-played-cards .card-shell {
+    transform: rotate(90deg);
+}
+
+.card-shell {
+    transition: transform 0.2s ease;
+}
+
+/* 窄屏（横屏小屏）整体缩小卡牌 */
+@media (max-height: 520px) {
+    :root {
+        --card-w: 36px;
+        --card-h: 50px;
+    }
+    .player-played-cards {
+        --card-w: 30px;
+        --card-h: 42px;
+    }
+}
+
+@media (min-height: 760px) and (min-width: 900px) {
+    :root {
+        --card-w: 52px;
+        --card-h: 72px;
+    }
+}

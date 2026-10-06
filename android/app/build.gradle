@@ -1,0 +1,91 @@
+// ============================================================================
+//  骗子酒馆 Android 壳 —— app 模块
+//  设计原则：零第三方依赖（没有 androidx、没有 appcompat），
+//  所以只要能解析到 Android Gradle Plugin 就能构建，不需要联网拉其它 jar。
+// ============================================================================
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.liarsbar.android'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.liarsbar.android"
+        minSdk 26
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        debug {
+            // 直接产出可安装的 debug APK
+            minifyEnabled false
+            debuggable true
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    // 不要用 Kotlin：全部 Java。
+    // 只关闭两个用不到的生成步骤，减少构建面（不碰 shaders/renderscript 等在
+    // AGP 8.x 里可能已废弃的属性，避免脚本语法风险）。
+    buildFeatures {
+        buildConfig false
+        aidl false
+    }
+
+    packaging {
+        resources {
+            excludes += ['META-INF/*.kotlin_module', 'META-INF/DEPENDENCIES', 'META-INF/LICENSE*', 'META-INF/NOTICE*']
+        }
+    }
+
+    lint {
+        // 本机可能没有完整 SDK 组件，lint 出错不要阻断 assemble。
+        abortOnError false
+        checkReleaseBuilds false
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 把并行编写的 core 模块源码一起编译进 APK（core 包名 com.liarsbar.core）。
+// 路径相对于本文件所在的 app/ 目录：app/ -> android/ -> liarbar/ -> liarbar/core/src/main/java
+// ---------------------------------------------------------------------------
+android.sourceSets.main.java.srcDirs(['../../core/src/main/java'])
+
+// ---------------------------------------------------------------------------
+// 可选：让 assemble* 自动先同步网页资源。
+// 默认关闭（不依赖 PowerShell 执行策略），需要时用
+//     gradlew assembleDebug -PsyncWeb=true
+// 显式开启。
+// ---------------------------------------------------------------------------
+def syncWebRequested = (project.findProperty('syncWeb') ?: 'false').toString().toBoolean()
+
+tasks.register('syncWebAssets', Exec) {
+    group = 'liarbar'
+    description = '把 core/src/main/resources/web/** 同步到 app/src/main/assets/web/**'
+
+    def script = rootProject.file('../tools/sync-web.ps1')
+    onlyIf { script.exists() }
+
+    commandLine 'powershell.exe',
+            '-NoProfile',
+            '-ExecutionPolicy', 'Bypass',
+            '-File', script.absolutePath
+}
+
+tasks.matching { it.name == 'preBuild' }.configureEach {
+    if (syncWebRequested) {
+        dependsOn 'syncWebAssets'
+    }
+}

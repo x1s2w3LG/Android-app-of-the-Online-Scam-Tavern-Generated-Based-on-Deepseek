@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">骗子酒馆 α版</string>
+
+    <!-- ServerService 前台通知 -->
+    <string name="notif_channel_name">游戏主机</string>
+    <string name="notif_channel_desc">保持局域网主机在后台运行</string>
+    <string name="notif_title">骗子酒馆 α版 主机运行中</string>
+    <string name="notif_text_starting">正在启动主机…</string>
+    <string name="notif_stop">停止主机</string>
+
+    <!-- 界面提示 -->
+    <string name="status_starting">正在启动主机…</string>
+
+    <!-- 返回键退出确认 -->
+    <string name="dialog_exit_title">退出游戏？</string>
+    <string name="dialog_exit_message">你现在是主机。退出会关闭房间，正在玩的朋友都会被断开。\n\n想继续招待朋友可以选「后台继续」，然后按 Home 键把游戏放到后台。</string>
+    <string name="dialog_exit_stop">退出并关房</string>
+    <string name="dialog_exit_keep">后台继续</string>
+    <string name="dialog_cancel">取消</string>
+</resources>

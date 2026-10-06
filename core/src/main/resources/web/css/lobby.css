@@ -1,0 +1,646 @@
+/* ==========================================================================
+   lobby.css —— 大厅视图：昵称输入、进入房间、玩家列表、开始游戏、局域网分享
+   ========================================================================== */
+
+.view-lobby {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 1.6vh, 18px);
+    align-items: stretch;
+    justify-content: center;
+    padding: clamp(8px, 2vh, 22px) clamp(10px, 3vw, 30px);
+    /*
+     * 内容放得下就居中，放不下要能滚到 —— 手机上系统字号偏大时，
+     * 原来这里写 overflow:hidden 会让底部的按钮永远点不到。
+     */
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    justify-content: flex-start;
+}
+
+/* 配合 justify-content:flex-start：有空间时靠 auto 外边距居中，溢出时自动塌成 0 */
+.view-lobby > :first-child { margin-top: auto; }
+.view-lobby > :last-child { margin-bottom: auto; }
+
+.view-lobby > * {
+    min-height: 0;
+}
+
+/* ------------------------------ 左侧面板 ------------------------------ */
+.lobby-panel {
+    width: 100%;
+    max-width: 460px;
+    margin: 0 auto;
+    padding: clamp(10px, 2vh, 20px) clamp(12px, 3vw, 22px);
+    border-radius: 16px;
+    background: linear-gradient(180deg, rgba(43, 59, 46, 0.96), rgba(24, 36, 27, 0.96));
+    border: 2px solid rgba(139, 195, 74, 0.45);
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(7px, 1.3vh, 13px);
+}
+
+.lobby-title {
+    margin: 0;
+    font-size: clamp(19px, 2.4vw + 8px, 30px);
+    letter-spacing: 5px;
+    color: var(--green-light);
+    text-shadow: 0 0 16px rgba(139, 195, 74, 0.45);
+    text-align: center;
+}
+
+.lobby-sub {
+    margin: 0 0 2px;
+    text-align: center;
+    font-size: clamp(10px, 0.7vw + 7px, 13px);
+    color: var(--ink-dim);
+}
+
+.field {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.field-label {
+    font-size: clamp(11px, 0.8vw + 8px, 14px);
+    color: var(--ink-dim);
+    white-space: nowrap;
+}
+
+.input {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 44px;                 /* 触摸友好 */
+    padding: 8px 12px;
+    font-size: clamp(13px, 0.9vw + 8px, 16px);
+    font-family: inherit;
+    color: var(--ink);
+    background: rgba(0, 0, 0, 0.35);
+    border: 2px solid var(--line);
+    border-radius: var(--radius);
+    outline: none;
+    user-select: text;
+    -webkit-user-select: text;
+}
+
+.input:focus {
+    border-color: var(--green-light);
+    box-shadow: 0 0 0 3px rgba(139, 195, 74, 0.2);
+}
+
+.input[readonly] {
+    color: var(--accent);
+}
+
+/* ------------------------------ 局域网分享 ------------------------------ */
+.share {
+    padding: 8px 10px;
+    border-radius: var(--radius);
+    background: rgba(116, 241, 9, 0.08);
+    border: 1px dashed rgba(116, 241, 9, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.share-label {
+    font-size: clamp(10px, 0.7vw + 7px, 12px);
+    color: #cdf3b4;
+}
+
+.share-row {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+}
+
+.share-input {
+    font-size: clamp(11px, 0.8vw + 8px, 14px);
+    min-height: 40px;
+}
+
+.hint-line {
+    font-size: clamp(10px, 0.7vw + 7px, 12px);
+    color: var(--ink-dim);
+    text-align: center;
+    min-height: 16px;
+}
+
+/* ------------------------------ 右侧玩家列表 ------------------------------ */
+.lobby-players {
+    width: 100%;
+    max-width: 460px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 0;
+}
+
+.lobby-players-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: clamp(12px, 0.9vw + 8px, 15px);
+    font-weight: 700;
+    color: var(--green-light);
+}
+
+.lobby-players-head .count {
+    font-size: clamp(10px, 0.7vw + 7px, 13px);
+    font-weight: 400;
+    color: var(--ink-dim);
+}
+
+.lobby-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    overflow: hidden auto;
+    max-height: min(46vh, 320px);
+    padding-right: 2px;
+}
+
+.lobby-list .empty {
+    padding: 14px;
+    text-align: center;
+    font-size: clamp(11px, 0.8vw + 8px, 14px);
+    color: var(--ink-dim);
+    border: 1px dashed var(--line);
+    border-radius: var(--radius);
+}
+
+.lobby-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: var(--radius);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--line);
+    min-height: 44px;
+}
+
+.lobby-row.is-offline {
+    opacity: 0.6;
+    border-style: dashed;
+}
+
+.lobby-row.is-dead {
+    filter: grayscale(100%);
+    opacity: 0.5;
+}
+
+.lobby-row .seat-no {
+    width: 22px;
+    height: 22px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: var(--green-dark);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lobby-row .p-name {
+    font-weight: 700;
+    font-size: clamp(12px, 0.9vw + 8px, 15px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.lobby-row .tags {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex: 0 0 auto;
+}
+
+.lobby-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    min-height: 44px;
+}
+
+.lobby-actions .btn {
+    min-width: 150px;
+}
+
+.disabled-reason {
+    font-size: clamp(10px, 0.7vw + 7px, 12px);
+    color: #ffcf8a;
+    text-align: center;
+    width: 100%;
+}
+
+.wait-host {
+    font-size: clamp(11px, 0.8vw + 8px, 14px);
+    color: var(--ink-dim);
+    animation: banner-pulse 1.8s ease-in-out infinite;
+}
+
+/* ------------------------------ 宽屏（桌面 / 平板横屏） ------------------------------ */
+@media (min-width: 820px) and (orientation: landscape) {
+    .view-lobby {
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: clamp(16px, 2vw, 40px);
+    }
+    .lobby-panel {
+        flex: 0 1 440px;
+        margin: 0;
+    }
+    .lobby-players {
+        flex: 0 1 440px;
+        margin: 0;
+    }
+    .lobby-list {
+        max-height: min(58vh, 420px);
+    }
+}
+
+/* 极矮横屏：进一步压缩 */
+@media (max-height: 520px) {
+    .lobby-title {
+        letter-spacing: 3px;
+    }
+    .lobby-sub {
+        display: none;
+    }
+    .lobby-panel {
+        gap: 6px;
+        padding: 8px 12px;
+    }
+    .view-lobby {
+        padding: 6px 10px;
+        gap: 8px;
+    }
+    .lobby-list {
+        max-height: min(38vh, 200px);
+    }
+}
+
+/* 矮屏且窄（竖屏小机）时允许列表滚动 */
+@media (max-height: 480px) and (orientation: portrait) {
+    .view-lobby {
+        justify-content: flex-start;
+    }
+}
+
+/* ==================================================================
+   改名浮层（大厅与牌桌都能用）
+   ================================================================== */
+.rename-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(6, 12, 8, 0.72);
+}
+.rename-layer[hidden] { display: none; }
+
+.rename-card {
+    width: min(86vw, 360px);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+}
+
+.rename-title {
+    color: var(--ink);
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.rename-card .input { width: 100%; }
+
+.rename-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+.rename-actions .btn {
+    flex: 1;
+    min-height: 44px;
+}
+
+.rename-tip {
+    color: var(--ink-dim);
+    font-size: 12px;
+    margin-top: 8px;
+}
+
+/* 牌桌状态条上的「改名」小按钮 */
+.name-edit {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink-dim);
+    border-radius: 6px;
+    padding: 2px 7px;
+    margin-left: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 1.5;
+}
+.name-edit:hover,
+.name-edit:active {
+    color: var(--accent);
+    border-color: var(--accent);
+}
+/* ==================================================================
+   机器人 / 改名 相关
+   ================================================================== */
+.bot-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.btn-sm {
+    min-height: 38px;
+    font-size: 13px;
+    padding: 0 12px;
+}
+
+.badge-bot {
+    background: rgba(116, 241, 9, 0.14);
+    color: var(--accent);
+    border: 1px solid rgba(116, 241, 9, 0.35);
+}
+/* ==================================================================
+   规则说明浮层
+   ================================================================== */
+.rules-btn {
+    margin-left: 10px;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink-dim);
+    border-radius: 6px;
+    padding: 1px 8px;
+    font-size: 12px;
+    line-height: 1.6;
+    cursor: pointer;
+    font-family: inherit;
+    vertical-align: middle;
+}
+.rules-btn:hover, .rules-btn:active { color: var(--accent); border-color: var(--accent); }
+
+.rules-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(4, 9, 6, 0.82);
+    padding: 2vh 2vw;
+}
+.rules-layer[hidden] { display: none; }
+
+.rules-card {
+    position: relative;
+    width: min(96vw, 900px);
+    height: min(94vh, 760px);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 16px 50px rgba(0, 0, 0, 0.6);
+}
+.rules-frame {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #0f1712;
+    display: block;
+}
+.rules-close {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    z-index: 2;
+    background: rgba(15, 23, 18, 0.92);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    border-radius: 7px;
+    padding: 5px 10px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+}
+.rules-close:active { color: var(--accent); border-color: var(--accent); }
+
+/* ==================================================================
+   局内聊天
+   ================================================================== */
+.chat {
+    position: fixed;
+    right: 10px;
+    bottom: 10px;
+    z-index: 55;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    pointer-events: none;   /* 只有按钮和面板可点，不挡牌桌 */
+}
+.chat > * { pointer-events: auto; }
+
+.chat-toggle {
+    position: relative;
+    background: rgba(33, 47, 36, 0.94);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    border-radius: 20px;
+    padding: 7px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+}
+.chat-toggle:active { border-color: var(--accent); color: var(--accent); }
+
+.chat-dot {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--danger);
+    border: 1px solid var(--panel);
+}
+
+.chat-panel {
+    width: min(320px, 46vw);
+    background: rgba(22, 38, 27, 0.96);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+.chat-panel[hidden] { display: none; }
+
+.chat-log {
+    max-height: min(190px, 34vh);
+    overflow-y: auto;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--ink);
+    word-break: break-word;
+}
+.chat-line { margin: 2px 0; }
+.chat-line .chat-name { color: var(--accent); margin-right: 5px; }
+.chat-line.is-system { color: var(--ink-dim); font-size: 12px; }
+.chat-empty { color: var(--ink-dim); font-size: 12px; }
+
+.chat-row { display: flex; gap: 6px; }
+.chat-input { flex: 1; min-width: 0; padding: 8px 10px; font-size: 14px; }
+
+/* ==================================================================
+   修改分享地址
+   ================================================================== */
+.lan-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 65;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(6, 12, 8, 0.72);
+}
+.lan-layer[hidden] { display: none; }
+
+.lan-card {
+    width: min(88vw, 420px);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+}
+.lan-card .input { width: 100%; }
+
+.lan-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+}
+.chip {
+    background: #16261b;
+    border: 1px solid var(--line);
+    color: var(--ink);
+    border-radius: 14px;
+    padding: 5px 11px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+}
+.chip:active { border-color: var(--accent); color: var(--accent); }
+
+/* 大厅分享地址旁边的「改」按钮 */
+.lan-edit {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink-dim);
+    border-radius: 6px;
+    padding: 2px 7px;
+    margin-left: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 1.5;
+    font-family: inherit;
+}
+.lan-edit:active { color: var(--accent); border-color: var(--accent); }
+/* ==================================================================
+   大厅里的头像设置
+   ================================================================== */
+.avatar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0 2px;
+}
+.avatar-box { display: inline-flex; }
+.avatar-btns {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+/* ==================================================================
+   胜场榜（数据按设备 UID 统计，存在房主设备上；改名不影响）
+   ================================================================== */
+.board {
+    margin-top: clamp(6px, 1.2vh, 14px);
+    padding: clamp(6px, 1.2vh, 12px) clamp(8px, 1.6vw, 14px);
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(43, 59, 46, 0.9), rgba(24, 36, 27, 0.9));
+    border: 1px solid rgba(255, 209, 102, 0.35);
+}
+
+.board-head {
+    color: var(--gold);
+    font-size: clamp(11px, 0.8vw + 8px, 14px);
+    margin-bottom: 5px;
+    letter-spacing: 0.04em;
+}
+
+.board-list {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.board-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: clamp(11px, 0.75vw + 8px, 13px);
+    color: var(--ink-dim);
+}
+
+.board-row.is-me {
+    color: var(--gold);
+    font-weight: 600;
+}
+
+.board-rank {
+    width: 1.4em;
+    text-align: center;
+    color: var(--ink-dim);
+    flex: 0 0 auto;
+}
+
+.board-name {
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.board-wins {
+    flex: 0 0 auto;
+    font-variant-numeric: tabular-nums;
+}

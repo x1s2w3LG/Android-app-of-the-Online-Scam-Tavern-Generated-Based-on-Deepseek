@@ -1,0 +1,468 @@
+/* ==========================================================================
+   effects.css —— 交互与状态特效（沿用原有 class 命名：move-up / highlight / eliminated）
+   ========================================================================== */
+
+/* 卡片选中上移（手牌区在 table.css 中有更具体的样式，这里作为通用兜底） */
+.card.move-up {
+    transform: translateY(-16px) scale(1.05);
+    border-color: var(--accent);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45), 0 0 14px rgba(116, 241, 9, 0.55);
+}
+
+/* 高亮（当前回合 / 需要关注的对象） */
+.highlight {
+    background: linear-gradient(135deg, rgba(255, 255, 0, 0.28), rgba(255, 0, 0, 0.22));
+    color: #d9534f;
+    border: 2px solid #d9534f;
+    box-shadow: 0 0 10px rgba(217, 53, 69, 0.5), 0 0 20px rgba(217, 53, 69, 0.2);
+    transition: all 0.3s ease-in-out;
+}
+
+/* 被淘汰：置灰 */
+.eliminated {
+    filter: grayscale(100%);
+    opacity: 0.5;
+}
+
+/* 出牌区被质疑后：整块抖动一下 */
+.played-block.is-shake {
+    animation: block-shake 0.4s ease-in-out both;
+}
+
+@keyframes block-shake {
+    0%, 100% { transform: translateX(0); }
+    20%      { transform: translateX(-5px); }
+    45%      { transform: translateX(5px); }
+    70%      { transform: translateX(-3px); }
+}
+
+/* 翻牌结果：真话 / 谎言 闪烁提示 */
+.played-block.is-honest .card {
+    animation: flash-honest 0.6s ease-out both;
+}
+
+.played-block.is-lie .card {
+    animation: flash-lie 0.6s ease-out both;
+}
+
+@keyframes flash-honest {
+    0%   { box-shadow: 0 0 0 rgba(139, 195, 74, 0); }
+    40%  { box-shadow: 0 0 22px rgba(139, 195, 74, 1); }
+    100% { box-shadow: 0 0 12px rgba(139, 195, 74, 0.75); }
+}
+
+@keyframes flash-lie {
+    0%   { box-shadow: 0 0 0 rgba(255, 107, 107, 0); }
+    40%  { box-shadow: 0 0 24px rgba(255, 107, 107, 1); }
+    100% { box-shadow: 0 0 14px rgba(255, 107, 107, 0.85); }
+}
+
+/* 新牌入场 */
+.pop-in {
+    animation: pop-in 0.25s cubic-bezier(0.2, 1.4, 0.5, 1) both;
+}
+
+@keyframes pop-in {
+    from { opacity: 0; transform: translateY(12px) scale(0.85); }
+    to   { opacity: 1; transform: none; }
+}
+
+/* 座位被淘汰时的“倒下”效果 */
+.seat.just-died {
+    animation: seat-die 0.6s ease-in both;
+}
+
+@keyframes seat-die {
+    0%   { transform: none; }
+    25%  { transform: translateY(-6px) scale(1.05); }
+    100% { transform: none; }
+}
+
+/* 红点闪烁（自己成为可质疑/被质疑目标时） */
+.pulse-danger {
+    animation: pulse-danger 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-danger {
+    from { box-shadow: 0 0 6px rgba(255, 107, 107, 0.4); }
+    to   { box-shadow: 0 0 18px rgba(255, 107, 107, 0.95); }
+}
+
+/* ==================================================================
+   小丑牌（协议里的 J）：可以当任意目标牌出
+   ================================================================== */
+.card.is-joker {
+    background: linear-gradient(150deg, #3a2450 0%, #6a3d8f 55%, #2a1a3a 100%);
+    border-color: #ffd166;
+    box-shadow: 0 0 0 2px rgba(255, 209, 102, 0.35), 0 4px 12px rgba(0, 0, 0, 0.45);
+}
+
+.card-value.card-joker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.06em;
+    color: #ffd166;
+    line-height: 1;
+}
+.card-joker b {
+    font-size: 0.6em;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+}
+.card-joker .joker-sub {
+    font-size: 0.32em;
+    font-style: normal;
+    letter-spacing: 0.16em;
+    opacity: 0.78;
+}
+
+/* 小丑脸用 CSS 画，避免依赖 emoji 字体 */
+.joker-face {
+    position: relative;
+    display: block;
+    width: 0.5em;
+    height: 0.5em;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 45%, #fff 0 50%, #ffd166 51% 100%);
+}
+.joker-face::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: -0.3em;
+    width: 0.28em;
+    height: 0.28em;
+    transform: translateX(-50%) rotate(45deg);
+    background: linear-gradient(135deg, #ffd166, #ff8a3d);
+    border-radius: 2px;
+}
+
+/* ==================================================================
+   开枪：左轮转轮在屏幕正中旋转
+   ================================================================== */
+.revolver-stage {
+    position: fixed;
+    inset: 0;
+    z-index: 78;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.9));
+    pointer-events: none;
+    animation: rs-in 0.16s ease-out both;
+}
+@keyframes rs-in { from { opacity: 0; } to { opacity: 1; } }
+
+.cyl-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+.cyl-title { color: var(--ink); font-size: 15px; letter-spacing: 0.08em; }
+
+.cyl-spin {
+    width: min(46vh, 300px);
+    height: min(46vh, 300px);
+    animation: cyl-turn 0.32s linear infinite;
+}
+.revolver-stage.is-hit .cyl-spin,
+.revolver-stage.is-dry .cyl-spin {
+    animation-play-state: paused;
+}
+.revolver-stage.is-hit .cyl-spin {
+    animation: cyl-recoil 0.36s ease-out both;
+}
+
+.cyl-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.65));
+}
+.cyl-body { fill: #2b3a2f; }
+.cyl-rim { fill: none; stroke: #8d9c8f; stroke-width: 6; }
+.cyl-chamber {
+    fill: #111a14;
+    stroke: #6f7f72;
+    stroke-width: 3;
+    transition: fill 0.15s linear;
+}
+.cyl-pin { fill: #6f7f72; }
+
+.revolver-stage.is-hit .cyl-chamber {
+    fill: #ff4b3e;
+    stroke: #ffd166;
+}
+.cyl-sub { color: var(--ink-dim); font-size: 13px; }
+.revolver-stage.is-hit .cyl-sub {
+    color: var(--danger);
+    font-size: 20px;
+    font-weight: 700;
+}
+
+@keyframes cyl-turn { to { transform: rotate(360deg); } }
+@keyframes cyl-recoil {
+    0% { transform: scale(1); }
+    35% { transform: scale(1.14); }
+    100% { transform: scale(1); }
+}
+
+/* 命中时全屏红闪 + 震屏 */
+body.shot-red::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 79;
+    background: rgba(255, 60, 40, 0.38);
+    pointer-events: none;
+    animation: red-fade 0.26s ease-out both;
+}
+@keyframes red-fade { to { opacity: 0; } }
+
+body.screen-shake { animation: screen-shake 0.6s ease-out; }
+@keyframes screen-shake {
+    0%, 100% { transform: translate(0, 0); }
+    12% { transform: translate(-9px, 5px); }
+    26% { transform: translate(8px, -6px); }
+    40% { transform: translate(-7px, -4px); }
+    55% { transform: translate(6px, 5px); }
+    70% { transform: translate(-4px, 3px); }
+    85% { transform: translate(2px, -2px); }
+}
+
+/* ==================================================================
+   质疑：異議あり！
+   ================================================================== */
+.objection {
+    position: fixed;
+    inset: 0;
+    z-index: 82;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    animation: obj-in 0.3s cubic-bezier(0.2, 1.5, 0.4, 1) both;
+}
+.objection.is-out { animation: obj-out 0.3s ease-in both; }
+
+.objection-img {
+    width: min(52vw, 600px);
+    max-height: 60vh;
+    background: #fff;
+    border: 5px solid #d32f2f;
+    border-radius: 12px;
+    padding: 6px 10px;
+    transform: rotate(-4deg);
+    box-shadow: 0 16px 44px rgba(0, 0, 0, 0.6), 0 0 0 3px rgba(0, 0, 0, 0.35);
+}
+
+@keyframes obj-in {
+    0% { opacity: 0; transform: scale(2.1) rotate(-11deg); }
+    60% { opacity: 1; transform: scale(0.95) rotate(-3deg); }
+    100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+@keyframes obj-out {
+    to { opacity: 0; transform: scale(1.16) translateY(-14px); }
+}
+/* ==================================================================
+   小丑牌牌面上的小丑图案（内联 SVG）
+   ================================================================== */
+.joker-svg {
+    width: 70%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+.jk-hat { fill: #7b46a8; stroke: #3a2450; stroke-width: 2; stroke-linejoin: round; }
+.jk-band { fill: #ffd166; stroke: #b8860b; stroke-width: 1.2; }
+.jk-bell { fill: #ffd166; stroke: #b8860b; stroke-width: 1.4; }
+.jk-face { fill: #ffe9c9; stroke: #8a5a24; stroke-width: 1.5; }
+.jk-eye { fill: #2a1a3a; }
+.jk-brow { fill: none; stroke: #8a5a24; stroke-width: 2.4; stroke-linecap: round; }
+.jk-mouth { fill: none; stroke: #b3372f; stroke-width: 2.6; stroke-linecap: round; }
+.jk-blush { fill: rgba(255, 120, 120, 0.5); }
+
+.card-value.card-joker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.03em;
+    line-height: 1;
+}
+.card-joker .joker-sub {
+    font-size: 0.3em;
+    font-style: normal;
+    color: #ffd166;
+    letter-spacing: 0.08em;
+}
+
+/* ==================================================================
+   头像（玩家上传的 / 机器人内置图案 / 名字首字兜底）
+   ================================================================== */
+.avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #16261b;
+    border: 1px solid var(--line);
+    flex: 0 0 auto;
+    vertical-align: middle;
+}
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.av-svg { width: 100%; height: 100%; display: block; }
+.av-initial {
+    font-style: normal;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.av-xs { width: 22px; height: 22px; font-size: 12px; }
+.av-sm { width: 30px; height: 30px; font-size: 15px; }
+.av-lg { width: 62px; height: 62px; font-size: 26px; }
+
+.avatar.is-mine {
+    cursor: pointer;
+    box-shadow: 0 0 0 2px rgba(116, 241, 9, 0.4);
+}
+.avatar.is-mine:active { box-shadow: 0 0 0 2px var(--accent); }
+.avatar.is-bot { background: #16262e; border-color: #3d6b7a; }
+
+/* 内置机器人头像的配色 */
+.av-head { fill: #7fd4e8; stroke: #2b6b7d; stroke-width: 2; }
+.av-eye { fill: #12303a; }
+.av-mouth { fill: #12303a; }
+.av-antenna { fill: #4a8fa3; }
+.av-bulb { fill: #ff6b6b; }
+.av-ear { fill: #59aec4; }
+
+.chat-line .avatar { margin-right: 5px; }
+/* ==================================================================
+   质疑判定：亮出被质疑的牌（排在「異議あり！」之后、"左轮"之前）
+   ================================================================== */
+.reveal-stage {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.55);
+    pointer-events: none;
+    animation: rv-in 0.26s ease-out both;
+}
+.reveal-stage.is-out { animation: rv-out 0.32s ease-in both; }
+
+.reveal-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 26px 16px;
+    border-radius: 16px;
+    background: rgba(12, 22, 16, 0.95);
+    border: 2px solid var(--line);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6);
+}
+.reveal-stage.is-lie .reveal-box {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 4px rgba(255, 90, 60, 0.16), 0 18px 50px rgba(0, 0, 0, 0.6);
+}
+.reveal-stage.is-truth .reveal-box { border-color: var(--accent); }
+
+.reveal-title { color: var(--ink-dim); font-size: 15px; }
+
+.reveal-cards {
+    display: flex;
+    gap: 10px;
+    --card-w: 74px;
+    --card-h: 104px;
+}
+.reveal-cards > * { animation: rv-card 0.3s ease-out both; }
+.reveal-cards > *:nth-child(2) { animation-delay: 0.09s; }
+.reveal-cards > *:nth-child(3) { animation-delay: 0.18s; }
+.reveal-card { cursor: default; }
+.reveal-none { color: var(--ink-dim); font-size: 28px; }
+
+.reveal-verdict {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+}
+.reveal-stage.is-lie .reveal-verdict { color: var(--danger); }
+.reveal-stage.is-truth .reveal-verdict { color: var(--accent); }
+.reveal-shooter { color: var(--ink-dim); font-size: 14px; }
+
+@keyframes rv-in {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+@keyframes rv-out {
+    to { opacity: 0; transform: scale(1.06); }
+}
+@keyframes rv-card {
+    from { opacity: 0; transform: translateY(-16px) rotate(-8deg); }
+    to { opacity: 1; transform: none; }
+}
+/* ==================================================================
+   出牌区：每组牌前面的「几张」小牌子
+   （判定高亮从 .played-block 挪到了 .played-group，这里补上新选择器）
+   ================================================================== */
+.played-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.played-count {
+    font-size: 11px;
+    line-height: 1;
+    color: var(--ink-dim);
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 3px 6px;
+    white-space: nowrap;
+    flex: 0 0 auto;
+}
+
+.played-group.is-honest .played-count { color: #ddfbc4; border-color: var(--accent); }
+.played-group.is-lie .played-count    { color: #ffd7d7; border-color: var(--danger); }
+
+.played-group.is-honest .card { animation: flash-honest 0.6s ease-out both; }
+.played-group.is-lie .card    { animation: flash-lie 0.6s ease-out both; }
+/* ==================================================================
+   异议素材的降级显示：没有 img/objection.png 时用大字顶上
+   （方便把图片换成自己的，或者直接把素材从仓库里删掉）
+   ================================================================== */
+.objection-fallback {
+    display: none;
+}
+
+.objection.objection-text .objection-fallback {
+    display: block;
+    font-size: clamp(30px, 10vw, 110px);
+    font-weight: 900;
+    color: #fff8e1;
+    letter-spacing: 0.08em;
+    text-shadow: 0 0 18px rgba(255, 120, 60, 0.9),
+                 0 6px 0 #b3341f,
+                 0 0 42px rgba(255, 60, 0, 0.55);
+    transform: rotate(-8deg);
+    animation: objection-pop 260ms cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+
+@keyframes objection-pop {
+    from { transform: rotate(-8deg) scale(0.4); opacity: 0; }
+    to   { transform: rotate(-8deg) scale(1); opacity: 1; }
+}

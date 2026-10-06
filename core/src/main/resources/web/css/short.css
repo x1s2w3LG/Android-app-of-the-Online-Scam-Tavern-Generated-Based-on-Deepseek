@@ -1,0 +1,287 @@
+/* ==========================================================================
+   short.css —— 手机横屏适配（必须最后加载，用来盖住前面的规则）
+
+   为什么需要这个文件：
+     真机横屏的 CSS 视口通常只有 780×360 左右（1080p、dpr≈3，
+     华为/荣耀/小米都差不多），而模拟器 1080p@dpr1.75 有 1100×617。
+     前面各文件里的 clamp() 最小值是按大屏定的，
+     在 360px 高的屏幕上会让大厅面板撑到 400px+，
+     结果按钮被挤出屏幕、元素互相重叠 —— 真机"点不到按钮"就是这么来的。
+
+   分档：
+     ≤ 620px 高：平板横屏 / 小笔记本，轻度压缩
+     ≤ 460px 高：矮横屏
+     ≤ 430px 高：手机横屏主战场（720p@dpr2、1080p@dpr2.5）
+     ≤ 370px 高：1080p@dpr3 这类，CSS 高只有 360
+     ≤ 320px 高：极端小视口（1440p@dpr4.5 等）
+   ========================================================================== */
+
+/* ------------------------------ ≤620px：轻度压缩 ------------------------------ */
+@media (max-height: 620px) {
+    :root {
+        --topbar-h: 34px;
+    }
+    body {
+        font-size: 13px;
+    }
+    .lobby-title {
+        font-size: clamp(16px, 1.6vw + 6px, 22px);
+    }
+    .lobby-sub {
+        font-size: 11px;
+    }
+}
+
+/* ------------------------------ ≤460px：矮横屏 ------------------------------ */
+@media (max-height: 460px) {
+    :root {
+        --topbar-h: 30px;
+    }
+    body {
+        font-size: 12px;
+    }
+    .topbar {
+        padding: 0 8px;
+    }
+    .topbar .brand,
+    .topbar-title {
+        font-size: 14px;
+    }
+    .rules-btn,
+    .sfx-btn {
+        font-size: 11px;
+        padding: 2px 7px;
+    }
+    .view-lobby {
+        padding: 4px 8px;
+        gap: 8px;
+    }
+    .lobby-panel {
+        gap: 5px;
+        padding: 7px 10px;
+        border-radius: 12px;
+    }
+    .lobby-title {
+        font-size: 16px;
+        letter-spacing: 2px;
+    }
+    .lobby-sub {
+        display: none;
+    }
+    .btn {
+        min-height: 30px;
+        font-size: 12px;
+        padding: 0 10px;
+    }
+    .input,
+    .lobby-panel input,
+    .chat-input {
+        min-height: 30px;
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+    .avatar.av-lg {
+        width: 34px;
+        height: 34px;
+        font-size: 15px;
+    }
+    .avatar.av-sm {
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+    }
+    .avatar.av-xs {
+        width: 18px;
+        height: 18px;
+        font-size: 10px;
+    }
+    .avatar-row {
+        gap: 6px;
+        margin: 3px 0 0;
+    }
+    .lobby-list {
+        max-height: 30vh;
+    }
+    .lobby-row {
+        padding: 3px 8px;
+        font-size: 12px;
+    }
+    .lobby-players-head {
+        font-size: 12px;
+        margin-bottom: 3px;
+    }
+    .share-label,
+    .tip,
+    .muted {
+        font-size: 10px;
+    }
+    .share-row {
+        gap: 6px;
+    }
+    .me-status {
+        font-size: 12px;
+    }
+    .play-btn,
+    .doubt-btn {
+        min-height: 32px;
+        font-size: 13px;
+    }
+    .chat-toggle {
+        font-size: 11px;
+        padding: 4px 9px;
+    }
+}
+
+/* ------------------------------ ≤430px：手机横屏主战场 ------------------------------ */
+@media (max-height: 430px) {
+    /* 横屏改成左右两栏，别再纵向堆叠 */
+    .view-lobby {
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 4px 8px;
+    }
+    .lobby-panel {
+        flex: 1 1 0;
+        max-width: 420px;
+        margin: 0;
+        gap: 4px;
+        padding: 6px 9px;
+    }
+    .lobby-players {
+        flex: 1 1 0;
+        max-width: 420px;
+        margin: 0;
+    }
+    .lobby-title {
+        font-size: 15px;
+    }
+    .lobby-list {
+        max-height: 44vh;
+    }
+    .lobby-actions {
+        gap: 5px;
+    }
+    .btn {
+        min-height: 28px;
+        font-size: 11.5px;
+    }
+    .input,
+    .lobby-panel input {
+        min-height: 27px;
+    }
+    .lobby-status {
+        font-size: 10px;
+    }
+}
+
+/* ------------------------------ ≤370px：1080p@dpr3 这类 ------------------------------ */
+@media (max-height: 370px) {
+    .lobby-title {
+        font-size: 14px;
+        letter-spacing: 1px;
+    }
+    .lobby-panel {
+        gap: 3px;
+        padding: 5px 8px;
+    }
+    .btn {
+        min-height: 26px;
+        font-size: 11px;
+        padding: 0 8px;
+    }
+    .input,
+    .lobby-panel input {
+        min-height: 25px;
+        font-size: 11px;
+    }
+    .lobby-list {
+        max-height: 40vh;
+    }
+    .lobby-row {
+        padding: 2px 6px;
+        font-size: 11px;
+    }
+    .avatar.av-lg {
+        width: 28px;
+        height: 28px;
+        font-size: 13px;
+    }
+    .share-label {
+        display: none;
+    }
+}
+
+/* ------------------------------ ≤320px：极端小视口 ------------------------------ */
+@media (max-height: 320px) {
+    :root {
+        --topbar-h: 26px;
+    }
+    .btn {
+        min-height: 24px;
+        font-size: 10.5px;
+    }
+    .lobby-title {
+        font-size: 13px;
+    }
+    .avatar.av-lg {
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+    }
+    .input,
+    .lobby-panel input {
+        min-height: 23px;
+        font-size: 10.5px;
+    }
+}
+
+/* ==========================================================================
+   牌桌：矮屏时把六弹巢/目标牌/手牌一起收一收
+   （牌本身的尺寸在 deck.css 里按 --card-h 走，这里压外层容器）
+   ========================================================================== */
+@media (max-height: 460px) {
+    .game-container {
+        padding: 2px 6px 4px;
+        gap: 3px;
+    }
+    .me-wrap {
+        gap: 4px;
+    }
+    .me-played {
+        min-height: 0;
+    }
+    .action-bar,
+    .actions {
+        gap: 6px;
+        padding-bottom: 2px;
+    }
+    .seat {
+        padding: 4px 7px;
+        border-radius: 10px;
+    }
+    .seat-name {
+        font-size: 12px;
+    }
+    .seat-meta {
+        font-size: 10px;
+    }
+    .center-panel,
+    .table-center {
+        padding: 5px 9px;
+        gap: 4px;
+    }
+    .target-card-wrap {
+        width: 46px;
+    }
+}
+
+/* 矮屏时"几张"小牌子再小一点，别把出牌区撑高 */
+@media (max-height: 460px) {
+    .played-count {
+        font-size: 9.5px;
+        padding: 2px 5px;
+        border-radius: 7px;
+    }
+}
